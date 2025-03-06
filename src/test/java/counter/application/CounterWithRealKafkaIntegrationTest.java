@@ -26,13 +26,11 @@ public class CounterWithRealKafkaIntegrationTest extends TestKitSupport { // <1>
   // logger
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CounterWithRealKafkaIntegrationTest.class);
 
-  // tag::kafka[]
   @Override
   protected TestKit.Settings testKitSettings() {
     return TestKit.Settings.DEFAULT
       .withEventingSupport(TestKit.Settings.EventingSupport.KAFKA);
   }
-  // end::kafka[]
 
   @Test
   public void verifyCounterEventSourcedConsumesFromKafka() {

@@ -8,7 +8,6 @@ import counter.domain.CounterEvent.ValueMultiplied;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// tag::topic-consumer[]
 @ComponentId("counter-events-topic-consumer")
 @Consume.FromTopic(value = "counter-events") // <1>
 public class CounterEventsTopicConsumer extends Consumer {
@@ -25,4 +24,3 @@ public class CounterEventsTopicConsumer extends Consumer {
     return effects().done();
   }
 }
-// end::topic-consumer[]
