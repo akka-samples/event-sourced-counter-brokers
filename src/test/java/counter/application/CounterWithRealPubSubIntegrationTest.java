@@ -18,13 +18,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CounterWithRealPubSubIntegrationTest extends TestKitSupport { // <1>
 
-  // tag::pubsub[]
   @Override
   protected TestKit.Settings testKitSettings() {
     return TestKit.Settings.DEFAULT
       .withEventingSupport(TestKit.Settings.EventingSupport.GOOGLE_PUBSUB);
   }
-  // end::pubsub[]
 
   @Test
   public void verifyCounterEventSourcedConsumesFromPubSub() {

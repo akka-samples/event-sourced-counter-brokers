@@ -32,16 +32,13 @@ public class CounterEndpoint {
       .invokeAsync(value);
   }
 
-  //tag::increaseWithError[]
   @Post("/{counterId}/increase-with-error/{value}")
   public CompletionStage<Integer> increaseWithError(String counterId, Integer value) {
     return componentClient.forEventSourcedEntity(counterId)
       .method(CounterEntity::increaseWithError)
       .invokeAsync(value); // <1>
   }
-  //end::increaseWithError[]
 
-  //tag::increaseWithResult[]
   @Post("/{counterId}/increase-with-result/{value}")
   public CompletionStage<HttpResponse> increaseWithResult(String counterId, Integer value) {
     return componentClient.forEventSourcedEntity(counterId)
@@ -53,7 +50,6 @@ public class CounterEndpoint {
           case ExceedingMaxCounterValue e -> badRequest(e.message());
         });
   }
-  //end::increaseWithResult[]
 
   @Post("/{counterId}/multiply/{value}")
   public CompletionStage<Integer> multiply(String counterId, Integer value) {

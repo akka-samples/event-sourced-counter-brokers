@@ -20,53 +20,39 @@ import java.util.concurrent.TimeUnit;
 import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// tag::class[]
 public class CounterIntegrationTest extends TestKitSupport { // <1>
 
-// end::class[]
 
-  // tag::eventing-config[]
   @Override
   protected TestKit.Settings testKitSettings() {
     return TestKit.Settings.DEFAULT
             .withTopicIncomingMessages("counter-commands") // <1>
             .withTopicOutgoingMessages("counter-events") // <2>
-            // end::eventing-config[]
             .withTopicOutgoingMessages("counter-events-with-meta");
-    // tag::eventing-config[]
   }
-  // end::eventing-config[]
 
-  // tag::test-topic[]
   private EventingTestKit.IncomingMessages commandsTopic;
   private EventingTestKit.OutgoingMessages eventsTopic;
-  // end::test-topic[]
 
   private EventingTestKit.OutgoingMessages eventsTopicWithMeta;
 
-  // tag::test-topic[]
 
   @BeforeAll
   public void beforeAll() {
     super.beforeAll();
     commandsTopic = testKit.getTopicIncomingMessages("counter-commands"); // <2>
     eventsTopic = testKit.getTopicOutgoingMessages("counter-events");
-    // end::test-topic[]
 
     eventsTopicWithMeta = testKit.getTopicOutgoingMessages("counter-events-with-meta");
-    // tag::test-topic[]
   }
-  // end::test-topic[]
 
   // since multiple tests are using the same topics, make sure to reset them before each new test
   // so unread messages from previous tests do not mess with the current one
-  // tag::clear-topics[]
   @BeforeEach // <1>
   public void clearTopics() {
     eventsTopic.clear(); // <2>
     eventsTopicWithMeta.clear();
   }
-  // end::clear-topics[]
 
   @Test
   public void verifyCounterEventSourcedWiring() {
@@ -99,7 +85,6 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
       .until(() -> await(getCounterState.invokeAsync()), new IsEqual<>(200));
   }
 
-  // tag::test-topic[]
 
   @Test
   public void verifyCounterEventSourcedPublishToTopic()  {
@@ -116,7 +101,6 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
     assertEquals(increaseCmd.value(), eventIncreased.getPayload().value()); // <5>
     assertEquals(multipleCmd.value(), eventMultiplied.getPayload().value());
   }
-  // end::test-topic[]
 
   @Test
   public void verifyIgnoreUnknownToTopic()  {
@@ -132,7 +116,6 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
     assertEquals(increaseCmd.value(), eventIncreased.getPayload().value()); // <6>
   }
 
-  // tag::test-topic-metadata[]
   @Test
   public void verifyCounterCommandsAndPublishWithMetadata() {
     var counterId = "test-topic-metadata";
@@ -153,7 +136,4 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
     assertEquals(counterId, actualMd.asCloudEvent().subject().get()); // <6>
     assertEquals("application/json", actualMd.get("Content-Type").get());
   }
-  // end::test-topic-metadata[]
-// tag::class[]
 }
-// end::class[]

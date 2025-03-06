@@ -18,7 +18,6 @@ public class CounterEntity extends EventSourcedEntity<Integer, CounterEvent> {
 
   private Logger logger = LoggerFactory.getLogger(CounterEntity.class);
 
-  //tag::increaseWithResult[]
   @JsonTypeInfo(use = JsonTypeInfo.Id.NAME) // <1>
   @JsonSubTypes({
     @JsonSubTypes.Type(value = CounterResult.Success.class, name = "Success"),
@@ -32,7 +31,6 @@ public class CounterEntity extends EventSourcedEntity<Integer, CounterEvent> {
     }
   }
 
-  //end::increaseWithResult[]
 
   @Override
   public Integer emptyState() {
@@ -47,33 +45,25 @@ public class CounterEntity extends EventSourcedEntity<Integer, CounterEvent> {
       .thenReply(identity());
   }
 
-  //tag::increaseWithError[]
   public Effect<Integer> increaseWithError(Integer value) {
     if (currentState() + value > 10000) {
       return effects().error("Increasing the counter above 10000 is blocked"); // <1>
     }
-    //end::increaseWithError[]
     logger.info("Counter {} increased by {}", this.commandContext().entityId(), value);
-    //tag::increaseWithError[]
     return effects()
       .persist(new ValueIncreased(value))
       .thenReply(identity());
   }
-  //end::increaseWithError[]
 
-  //tag::increaseWithResult[]
   public Effect<CounterResult> increaseWithResult(Integer value) {
     if (currentState() + value > 10000) {
       return effects().reply(new CounterResult.ExceedingMaxCounterValue("Increasing the counter above 10000 is blocked")); // <3>
     }
-    //end::increaseWithResult[]
     logger.info("Counter {} increased by {}", this.commandContext().entityId(), value);
-    //tag::increaseWithResult[]
     return effects()
       .persist(new ValueIncreased(value))
       .thenReply(CounterResult.Success::new); // <4>
   }
-  //end::increaseWithResult[]
 
   public ReadOnlyEffect<Integer> get() {
     return effects().reply(currentState());
