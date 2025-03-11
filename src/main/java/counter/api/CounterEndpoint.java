@@ -15,21 +15,29 @@ import java.util.concurrent.CompletionStage;
 import static akka.javasdk.http.HttpResponses.badRequest;
 import static akka.javasdk.http.HttpResponses.ok;
 
-@HttpEndpoint("/counter")
 @Acl(allow = @Acl.Matcher(principal = Acl.Principal.INTERNET))
+@HttpEndpoint("/counter")
 public class CounterEndpoint {
 
   private final ComponentClient componentClient;
 
-  public CounterEndpoint(ComponentClient componentClient) {
+  public CounterEndpoint(ComponentClient componentClient) { //<1>
     this.componentClient = componentClient;
   }
 
+  @Get("/{counterId}")
+  public CompletionStage<Integer> get(String counterId) {
+    return componentClient.forEventSourcedEntity(counterId) // <2>
+      .method(CounterEntity::get)
+      .invokeAsync(); // <3>
+  }
+
   @Post("/{counterId}/increase/{value}")
-  public CompletionStage<Integer> increase(String counterId, Integer value) {
+  public CompletionStage<HttpResponse> increase(String counterId, Integer value) {
     return componentClient.forEventSourcedEntity(counterId)
       .method(CounterEntity::increase)
-      .invokeAsync(value);
+      .invokeAsync(value)
+      .thenApply(__ -> ok()); // <4>
   }
 
   @Post("/{counterId}/increase-with-error/{value}")
@@ -58,14 +66,6 @@ public class CounterEndpoint {
       .invokeAsync(value);
   }
 
-  @Get("/{counterId}")
-  public CompletionStage<Integer> get(String counterId) {
-    return componentClient.forEventSourcedEntity(counterId)
-      .method(CounterEntity::get)
-      .invokeAsync();
-  }
-
   public record CounterRequest(String id, Integer value) {
   }
-
 }
