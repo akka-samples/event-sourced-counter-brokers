@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   verify:
-    name: Verfiy
+    name: Verify
     runs-on: ubuntu-22.04
     if: github.event.repository.fork == false
     steps:
@@ -43,6 +43,10 @@ jobs:
         with:
           jvm: temurin:1.21
 
+      - name: Boot up local brokers
+        run: |-
+          docker compose up -d
+      
       - name: mvn verify
         run: |-
           mvn verify --no-transfer-progress
