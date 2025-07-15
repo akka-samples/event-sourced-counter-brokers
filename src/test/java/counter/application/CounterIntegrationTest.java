@@ -1,5 +1,9 @@
 package counter.application;
 
+import static java.time.Duration.ofSeconds;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import akka.javasdk.CloudEvent;
 import akka.javasdk.testkit.EventingTestKit;
 import akka.javasdk.testkit.TestKit;
@@ -8,26 +12,21 @@ import counter.application.CounterCommandFromTopicConsumer.IncreaseCounter;
 import counter.application.CounterCommandFromTopicConsumer.MultiplyCounter;
 import counter.domain.CounterEvent.ValueIncreased;
 import counter.domain.CounterEvent.ValueMultiplied;
+import java.net.URI;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.net.URI;
-
-import static java.time.Duration.ofSeconds;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CounterIntegrationTest extends TestKitSupport { // <1>
 
 
   @Override
   protected TestKit.Settings testKitSettings() {
-    return TestKit.Settings.DEFAULT
-            .withTopicIncomingMessages("counter-commands") // <1>
-            .withTopicOutgoingMessages("counter-events") // <2>
-            .withTopicOutgoingMessages("counter-events-with-meta");
+    return TestKit.Settings.DEFAULT.withTopicIncomingMessages("counter-commands") // <1>
+      .withTopicOutgoingMessages("counter-events") // <2>
+      .withTopicOutgoingMessages("counter-events-with-meta");
   }
+
 
   private EventingTestKit.IncomingMessages commandsTopic;
   private EventingTestKit.OutgoingMessages eventsTopic;
@@ -44,6 +43,7 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
     eventsTopicWithMeta = testKit.getTopicOutgoingMessages("counter-events-with-meta");
   }
 
+
   // since multiple tests are using the same topics, make sure to reset them before each new test
   // so unread messages from previous tests do not mess with the current one
   @BeforeEach // <1>
@@ -52,30 +52,25 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
     eventsTopicWithMeta.clear();
   }
 
+
   @Test
   public void verifyCounterEventSourcedWiring() {
-
     var counterClient = componentClient.forEventSourcedEntity("001");
 
     // increase counter (from 0 to 10)
-    counterClient
-      .method(CounterEntity::increase)
-      .invoke(10);
+    counterClient.method(CounterEntity::increase).invoke(10);
 
     // multiply by 20 (from 10 to 200)
-    counterClient
-      .method(CounterEntity::multiply)
-      .invoke(20);
+    counterClient.method(CounterEntity::multiply).invoke(20);
 
-    var result = counterClient
-        .method(CounterEntity::get).invoke();
+    var result = counterClient.method(CounterEntity::get).invoke();
 
     assertThat(result).isEqualTo(200);
   }
 
 
   @Test
-  public void verifyCounterEventSourcedPublishToTopic()  {
+  public void verifyCounterEventSourcedPublishToTopic() {
     var counterId = "test-topic";
     var increaseCmd = new IncreaseCounter(counterId, 3);
     var multipleCmd = new MultiplyCounter(counterId, 4);
@@ -90,8 +85,9 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
     assertEquals(multipleCmd.value(), eventMultiplied.getPayload().multiplier());
   }
 
+
   @Test
-  public void verifyIgnoreUnknownToTopic()  {
+  public void verifyIgnoreUnknownToTopic() {
     var counterId = "test-ignore";
     var ignoreCmd = new CounterCommandFromTopicConsumer.IgnoredEvent("test");
     var increaseCmd = new IncreaseCounter(counterId, 1);
@@ -110,9 +106,10 @@ public class CounterIntegrationTest extends TestKitSupport { // <1>
     var increaseCmd = new IncreaseCounter(counterId, 10);
 
     var metadata = CloudEvent.of( // <1>
-        "cmd1",
-        URI.create("CounterTopicIntegrationTest"),
-        increaseCmd.getClass().getName())
+      "cmd1",
+      URI.create("CounterTopicIntegrationTest"),
+      increaseCmd.getClass().getName()
+    )
       .withSubject(counterId) // <2>
       .asMetadata()
       .add("Content-Type", "application/json"); // <3>

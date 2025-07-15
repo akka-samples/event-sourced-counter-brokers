@@ -16,11 +16,13 @@ public class CounterEventsConsumer extends Consumer { // <3>
   private Logger logger = LoggerFactory.getLogger(CounterEventsConsumer.class);
 
   public Effect onEvent(CounterEvent event) { // <4>
-    logger.info("Received increased event: {} (msg ce id {})", event.toString(), messageContext().metadata().asCloudEvent().id());
+    logger.info(
+      "Received increased event: {} (msg ce id {})",
+      event.toString(),
+      messageContext().metadata().asCloudEvent().id()
+    );
     return switch (event) {
-      case ValueIncreased valueIncreased ->
-        //processing value increased event
-        effects().done(); // <5>
+      case ValueIncreased valueIncreased -> effects().done(); // <5>
       case ValueMultiplied valueMultiplied -> effects().ignore(); // <6>
     };
   }

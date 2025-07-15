@@ -8,31 +8,29 @@ import akka.javasdk.view.View;
 import counter.domain.CounterEvent;
 import counter.domain.CounterEvent.ValueIncreased;
 import counter.domain.CounterEvent.ValueMultiplied;
-
 import java.util.List;
 
 @ComponentId("counter-by-value-enrichment")
 public class CounterByValueViewEnrichment extends View {
 
-  public record CounterByValueEntry(String name, int value) {
-  }
+  public record CounterByValueEntry(String name, int value) {}
 
-
-  public record CounterByValueEntries(List<CounterByValueEntry> counters) {
-  }
+  public record CounterByValueEntries(List<CounterByValueEntry> counters) {}
 
   @Consume.FromEventSourcedEntity(CounterEntity.class)
   public static class CounterByValueUpdater extends TableUpdater<CounterByValueEntry> {
+
     public Effect<CounterByValueEntry> onEvent(CounterEvent counterEvent) {
       var name = updateContext().eventSubject().get();
       return switch (counterEvent) {
-        case ValueIncreased increased -> effects().updateRow(
-          new CounterByValueEntry(name, increased.updatedValue())); // <1>
-        case ValueMultiplied multiplied -> effects().updateRow(
-          new CounterByValueEntry(name, multiplied.updatedValue())); // <1>
+        case ValueIncreased increased -> effects()
+          .updateRow(new CounterByValueEntry(name, increased.updatedValue())); // <1>
+        case ValueMultiplied multiplied -> effects()
+          .updateRow(new CounterByValueEntry(name, multiplied.updatedValue())); // <1>
       };
     }
   }
+
 
   @Query("SELECT * AS counters FROM counter_by_value WHERE value > :value")
   public QueryEffect<CounterByValueEntries> findByCountersByValueGreaterThan(int value) {
@@ -44,5 +42,3 @@ public class CounterByValueViewEnrichment extends View {
     return queryResult();
   }
 }
-
-

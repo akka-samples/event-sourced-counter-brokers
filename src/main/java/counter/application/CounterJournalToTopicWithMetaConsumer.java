@@ -11,10 +11,12 @@ import org.slf4j.LoggerFactory;
 
 @ComponentId("counter-journal-to-topic-with-meta")
 @Consume.FromEventSourcedEntity(CounterEntity.class)
-@Produce.ToTopic("counter-events-with-meta")  // <1>
+@Produce.ToTopic("counter-events-with-meta") // <1>
 public class CounterJournalToTopicWithMetaConsumer extends Consumer {
 
-  private Logger logger = LoggerFactory.getLogger(CounterJournalToTopicWithMetaConsumer.class);
+  private Logger logger = LoggerFactory.getLogger(
+    CounterJournalToTopicWithMetaConsumer.class
+  );
 
   public Effect onEvent(CounterEvent event) {
     String counterId = messageContext().metadata().asCloudEvent().subject().get(); // <2>
