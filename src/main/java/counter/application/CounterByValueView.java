@@ -1,6 +1,6 @@
 package counter.application;
 
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.annotations.Consume;
 import akka.javasdk.annotations.Query;
 import akka.javasdk.view.TableUpdater;
@@ -11,7 +11,7 @@ import counter.domain.CounterEvent.ValueMultiplied;
 import java.util.List;
 import java.util.Optional;
 
-@ComponentId("counter-by-value")
+@Component(id = "counter-by-value")
 public class CounterByValueView extends View {
 
   public record CounterByValue(String name, int value) {}
