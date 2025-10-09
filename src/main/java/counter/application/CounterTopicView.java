@@ -1,6 +1,6 @@
 package counter.application;
 
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.annotations.Consume;
 import akka.javasdk.annotations.Query;
 import akka.javasdk.view.TableUpdater;
@@ -13,7 +13,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ComponentId("counter-topic-view")
+@Component(id = "counter-topic-view")
 public class CounterTopicView extends View {
 
   private static final Logger logger = LoggerFactory.getLogger(CounterTopicView.class);
