@@ -1,6 +1,6 @@
 package counter.application;
 
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.annotations.Consume;
 import akka.javasdk.consumer.Consumer;
 import counter.application.CounterStore.CounterEntry;
@@ -9,7 +9,7 @@ import counter.domain.CounterEvent.ValueIncreased;
 import counter.domain.CounterEvent.ValueMultiplied;
 import java.util.Optional;
 
-@ComponentId("counter-store-updater")
+@Component(id = "counter-store-updater")
 @Consume.FromEventSourcedEntity(CounterEntity.class)
 public class CounterStoreUpdater extends Consumer {
 
