@@ -19,7 +19,7 @@ public class CounterJournalToTopicWithMetaConsumer extends Consumer {
   );
 
   public Effect onEvent(CounterEvent event) {
-    String counterId = messageContext().metadata().asCloudEvent().subject().get(); // <2>
+    String counterId = messageContext().eventSubject().get(); // <2>
     Metadata metadata = Metadata.EMPTY.add("ce-subject", counterId);
     logger.info("Received event for counter id {}: {}", counterId, event);
     return effects().produce(event, metadata); // <3>
