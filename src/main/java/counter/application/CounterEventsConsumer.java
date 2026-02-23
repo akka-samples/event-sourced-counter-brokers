@@ -2,6 +2,7 @@ package counter.application;
 
 import akka.javasdk.annotations.Component;
 import akka.javasdk.annotations.Consume;
+import akka.javasdk.annotations.SnapshotHandler;
 import akka.javasdk.consumer.Consumer;
 import counter.domain.CounterEvent;
 import counter.domain.CounterEvent.ValueIncreased;
@@ -15,11 +16,22 @@ public class CounterEventsConsumer extends Consumer { // <3>
 
   private Logger logger = LoggerFactory.getLogger(CounterEventsConsumer.class);
 
+  @SnapshotHandler
+  public Effect onSnapshot(Integer value) {
+    logger.info(
+      "Received snapshot: {} (entity id {})",
+      value,
+      messageContext().eventSubject().orElse("")
+    );
+    return effects().done();
+  }
+
+
   public Effect onEvent(CounterEvent event) { // <4>
     logger.info(
-      "Received increased event: {} (msg ce id {})",
-      event.toString(),
-      messageContext().metadata().asCloudEvent().id()
+      "Received increased event: {} (entity id {})",
+      event,
+      messageContext().eventSubject().orElse("")
     );
     return switch (event) {
       case ValueIncreased valueIncreased -> effects().done(); // <5>
